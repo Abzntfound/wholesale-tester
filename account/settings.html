@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account settings | Wholesale Clearance UK</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <main class="container page-main account-page">
+    <h1>Account settings</h1>
+    <nav class="account-nav"><a href="index.html">← Back to account</a></nav>
+    <form class="auth-form" id="settings-form">
+      <label>Name <input type="text" id="setting-name" required></label>
+      <label>Email <input type="email" id="setting-email" readonly></label>
+      <button type="submit" class="btn btn-primary">Save changes</button>
+    </form>
+    <p class="prototype-note">Settings stored locally in prototype mode.</p>
+  </main>
+  <script type="module">
+    import { requireAuth, getSession } from '../js/account.js';
+    if (!requireAuth()) throw new Error('redirect');
+    const s = getSession();
+    document.getElementById('setting-name').value = s?.name || '';
+    document.getElementById('setting-email').value = s?.email || '';
+  </script>
+</body>
+</html>

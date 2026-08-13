@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create account | Wholesale Clearance UK</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <main class="container page-main auth-page">
+    <a href="../joblots.html" class="logo auth-logo">Wholesale Clearance UK</a>
+    <div class="auth-card">
+      <h1>Create account</h1>
+      <p class="auth-note">Demo registration — stored in localStorage only.</p>
+      <form id="register-form" class="auth-form">
+        <label>Name <input type="text" name="name" required autocomplete="name"></label>
+        <label>Email <input type="email" name="email" required autocomplete="email"></label>
+        <label>Password <input type="password" name="password" required minlength="6" autocomplete="new-password"></label>
+        <button type="submit" class="btn btn-primary btn-block">Create account</button>
+      </form>
+      <p class="auth-links"><a href="sign-in.html">Already have an account?</a></p>
+      <p id="auth-error" class="auth-error" role="alert" hidden></p>
+    </div>
+  </main>
+  <script type="module">
+    import { register } from '../js/account.js';
+    document.getElementById('register-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      try {
+        register({ name: fd.get('name'), email: fd.get('email'), password: fd.get('password') });
+        location.href = 'index.html';
+      } catch (err) {
+        const el = document.getElementById('auth-error');
+        el.hidden = false; el.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

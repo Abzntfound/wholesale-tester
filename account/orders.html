@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders | Wholesale Clearance UK</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <main class="container page-main account-page">
+    <h1>My orders</h1>
+    <nav class="account-nav"><a href="index.html">← Back to account</a></nav>
+    <table class="orders-table"><thead><tr><th>Order</th><th>Date</th><th>Status</th><th>Total</th></tr></thead>
+    <tbody id="orders-body"></tbody></table>
+    <p class="prototype-note">Sample order history for prototype UI.</p>
+  </main>
+  <script type="module">
+    import { requireAuth, getDemoOrders } from '../js/account.js';
+    if (!requireAuth()) throw new Error('redirect');
+    document.getElementById('orders-body').innerHTML = getDemoOrders().map(o =>
+      `<tr><td><a href="order.html?id=${o.id}">${o.id}</a></td><td>${o.date}</td><td>${o.status}</td><td>£${o.total.toFixed(2)}</td></tr>`
+    ).join('');
+  </script>
+</body>
+</html>

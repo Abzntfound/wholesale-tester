@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My account | Wholesale Clearance UK</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="site-header"><div class="header-main"><div class="container header-main-inner">
+    <a href="../joblots.html" class="logo"><span class="logo-text">Wholesale <strong>Clearance UK</strong></span></a>
+    <nav class="header-actions"><a href="../basket.html" class="header-action">Basket</a></nav>
+  </div></div></header>
+  <main class="container page-main account-page">
+    <h1>My account</h1>
+    <div class="account-layout">
+      <nav class="account-nav" aria-label="Account">
+        <a href="index.html" aria-current="page">Dashboard</a>
+        <a href="orders.html">Orders</a>
+        <a href="settings.html">Settings</a>
+        <a href="#" id="sign-out">Sign out</a>
+      </nav>
+      <div class="account-content">
+        <p>Welcome, <strong id="user-name">Guest</strong></p>
+        <div class="account-cards">
+          <a href="orders.html" class="account-card"><h2>Orders</h2><p>View order history</p></a>
+          <a href="../wishlist.html" class="account-card"><h2>Wishlist</h2><p>Saved products</p></a>
+          <a href="../basket.html" class="account-card"><h2>Basket</h2><p>Current basket</p></a>
+          <a href="settings.html" class="account-card"><h2>Settings</h2><p>Account details</p></a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script type="module">
+    import { requireAuth, getSession, signOut } from '../js/account.js';
+    if (!requireAuth()) throw new Error('redirect');
+    const session = getSession();
+    document.getElementById('user-name').textContent = session?.name || session?.email || 'Customer';
+    document.getElementById('sign-out').addEventListener('click', (e) => { e.preventDefault(); signOut(); location.href = 'sign-in.html'; });
+  </script>
+</body>
+</html>

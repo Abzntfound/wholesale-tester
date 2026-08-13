@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order details | Wholesale Clearance UK</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <main class="container page-main account-page">
+    <nav class="account-nav"><a href="orders.html">← Back to orders</a></nav>
+    <header class="order-header">
+      <h1 id="order-title">Order</h1>
+      <p id="order-meta" class="order-meta"></p>
+    </header>
+    <section class="order-summary" aria-labelledby="order-items-heading">
+      <h2 id="order-items-heading">Items</h2>
+      <ul id="order-items" class="order-items"></ul>
+    </section>
+    <section class="order-totals" aria-labelledby="order-totals-heading">
+      <h2 id="order-totals-heading" class="visually-hidden">Totals</h2>
+      <dl id="order-totals" class="order-totals-list"></dl>
+    </section>
+    <p class="prototype-note">Sample order detail for prototype UI — not connected to a live order system.</p>
+  </main>
+  <script type="module">
+    import { requireAuth, getDemoOrders } from '../js/account.js';
+
+    if (!requireAuth()) throw new Error('redirect');
+
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('id');
+    const order = getDemoOrders().find(o => o.id === orderId);
+
+    if (!order) {
+      document.querySelector('.order-header').innerHTML =
+        '<h1>Order not found</h1><p>We could not find that order reference.</p>';
+      throw new Error('missing order');
+    }
+
+    document.getElementById('order-title').textContent = `Order ${order.id}`;
+    document.getElementById('order-meta').textContent =
+      `Placed ${order.date} · ${order.status}`;
+
+    document.getElementById('order-items').innerHTML = `
+      <li class="order-item">
+        <span class="order-item-name">Wholesale job lot (sample)</span>
+        <span class="order-item-qty">× ${order.items}</span>
+        <span class="order-item-price">£${order.total.toFixed(2)}</span>
+      </li>`;
+
+    document.getElementById('order-totals').innerHTML = `
+      <div><dt>Subtotal</dt><dd>£${order.total.toFixed(2)}</dd></div>
+      <div><dt>Delivery</dt><dd>£0.00</dd></div>
+      <div class="order-total-row"><dt>Total</dt><dd>£${order.total.toFixed(2)}</dd></div>`;
+  </script>
+</body>
+</html>
