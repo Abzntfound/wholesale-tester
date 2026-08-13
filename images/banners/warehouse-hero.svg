@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="600" viewBox="0 0 1920 600" role="img" aria-label="Wholesale warehouse">
+  <defs>
+    <linearGradient id="hero-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#0c2340"/>
+    </linearGradient>
+    <linearGradient id="hero-accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="600" fill="url(#hero-bg)"/>
+  <rect width="1920" height="600" fill="url(#hero-accent)"/>
+  <g opacity="0.12" fill="#ffffff">
+    <rect x="100" y="180" width="120" height="280" rx="4"/>
+    <rect x="240" y="140" width="120" height="320" rx="4"/>
+    <rect x="380" y="200" width="120" height="260" rx="4"/>
+    <rect x="520" y="120" width="120" height="340" rx="4"/>
+    <rect x="660" y="160" width="120" height="300" rx="4"/>
+    <rect x="800" y="190" width="120" height="270" rx="4"/>
+    <rect x="940" y="150" width="120" height="310" rx="4"/>
+    <rect x="1080" y="170" width="120" height="290" rx="4"/>
+    <rect x="1220" y="130" width="120" height="330" rx="4"/>
+    <rect x="1360" y="200" width="120" height="260" rx="4"/>
+    <rect x="1500" y="160" width="120" height="300" rx="4"/>
+    <rect x="1640" y="180" width="120" height="280" rx="4"/>
+  </g>
+  <g opacity="0.08" stroke="#f59e0b" stroke-width="2" fill="none">
+    <path d="M0 480 L1920 480"/>
+    <path d="M0 520 L1920 520"/>
+  </g>
+</svg>
