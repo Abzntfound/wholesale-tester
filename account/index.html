@@ -32,10 +32,14 @@
   </main>
   <script type="module">
     import { requireAuth, getSession, signOut } from '../js/account.js';
-    if (!requireAuth()) throw new Error('redirect');
-    const session = getSession();
+    if (!(await requireAuth())) throw new Error('redirect');
+    const session = await getSession();
     document.getElementById('user-name').textContent = session?.name || session?.email || 'Customer';
-    document.getElementById('sign-out').addEventListener('click', (e) => { e.preventDefault(); signOut(); location.href = 'sign-in.html'; });
+    document.getElementById('sign-out').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut();
+      location.href = 'sign-in.html';
+    });
   </script>
 </body>
 </html>

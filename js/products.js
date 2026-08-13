@@ -95,17 +95,17 @@ export function renderCategoryGrid(container, categories, onCategoryClick) {
 
 export function bindProductInteractions(container) {
   container.querySelectorAll('[data-wishlist-id]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault(); e.stopPropagation();
-      Wishlist.toggle(btn.dataset.wishlistId);
+      await Wishlist.toggle(btn.dataset.wishlistId);
       btn.classList.toggle('is-active', Wishlist.has(btn.dataset.wishlistId));
       btn.setAttribute('aria-pressed', Wishlist.has(btn.dataset.wishlistId));
     });
   });
   container.querySelectorAll('[data-add-cart]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
-      Cart.add(btn.dataset.addCart);
+      await Cart.add(btn.dataset.addCart);
       btn.textContent = 'Added';
       btn.disabled = true;
       setTimeout(() => { btn.textContent = 'Add to basket'; btn.disabled = false; }, 1500);

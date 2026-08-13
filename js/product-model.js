@@ -39,6 +39,7 @@ export function normalizeProduct(raw) {
   p.dateAdded = p.dateAdded || new Date().toISOString().slice(0, 10);
   p.source = p.source || 'development-sample';
   p.legacyUrl = p.legacyUrl || null;
+  p.slug = p.slug || slugify(`${p.name}-${p.sku || p.id}`);
 
   const imageId = p.imageId || skuToImageId(p.sku);
   if (!p.image && imageId) {
@@ -53,7 +54,7 @@ export function normalizeProduct(raw) {
   }
 
   if (!p.url || p.url.startsWith('/product/')) {
-    p.url = `/product.html?sku=${encodeURIComponent(p.sku)}`;
+    p.url = `/product.html?slug=${encodeURIComponent(p.slug)}`;
   }
 
   return p;

@@ -51,9 +51,10 @@ export function flexibleMatch(text, term) {
   const field = String(text || '').toLowerCase().trim();
   const needle = String(term || '').toLowerCase().trim();
   if (!needle || !field) return false;
-  if (field.includes(needle) || needle.includes(field)) return true;
+  if (field.includes(needle)) return true;
+  if (needle.length >= 3 && field.length >= 3 && needle.includes(field)) return true;
 
-  const stem = (s) => s.replace(/s$/, '').replace(/ies$/, 'y');
+  const stem = (s) => s.replace(/ies$/, 'y').replace(/s$/, '');
   const fStem = stem(field);
   const nStem = stem(needle);
   if (fStem.includes(nStem) || nStem.includes(fStem)) return true;
@@ -77,13 +78,17 @@ export function productMatchesQuery(product, query) {
   const trimmed = String(query || '').trim();
   if (!trimmed) return true;
 
-  const terms = expandSearchTerms(trimmed);
-  const fields = getSearchFields(product);
+  const words = trimmed.toLowerCase().split(/\s+/).filter(w => w.length > 0);
+  if (!words.length) return true;
 
-  return terms.some(term =>
-    fields.some(field => flexibleMatch(field, term)) ||
-    matchesCategoryAlias(product, term)
-  );
+  return words.every(word => {
+    const terms = expandSearchTerms(word);
+    const fields = getSearchFields(product);
+    return terms.some(term =>
+      fields.some(field => flexibleMatch(field, term)) ||
+      matchesCategoryAlias(product, term)
+    );
+  });
 }
 
 export function searchProducts(query, options = {}) {

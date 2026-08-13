@@ -1,7 +1,7 @@
 /**
  * Product detail page.
  */
-import { initProductRepository, getProductBySku, getRelatedProducts, calcDiscount, formatCurrency, getStockLabel } from '../repositories/productRepository.js';
+import { initProductRepository, getProductBySku, getProductBySlug, getRelatedProducts, calcDiscount, formatCurrency, getStockLabel } from '../repositories/productRepository.js';
 import { renderProductGrid } from './products.js';
 import { initLayout } from './layout.js';
 import * as Cart from './cart.js';
@@ -16,7 +16,10 @@ async function bootstrap() {
 
   const params = new URLSearchParams(window.location.search);
   const sku = params.get('sku') || params.get('id');
-  const product = getProductBySku(sku);
+  const slug = params.get('slug');
+  const product = slug
+    ? getProductBySlug(slug)
+    : getProductBySku(sku);
 
   if (!product) {
     main.innerHTML = `<div class="empty-state" role="alert"><h1>Product not found</h1><p>We couldn't find a product matching <strong>${sku || 'that reference'}</strong>.</p><a href="joblots.html" class="btn btn-primary">Browse catalogue</a></div>`;
@@ -112,14 +115,14 @@ function renderRelated(product) {
 }
 
 function bindActions(product) {
-  document.getElementById('add-to-basket')?.addEventListener('click', () => {
-    Cart.add(product.id);
+  document.getElementById('add-to-basket')?.addEventListener('click', async () => {
+    await Cart.add(product.id);
     const btn = document.getElementById('add-to-basket');
     btn.textContent = 'Added to basket';
     setTimeout(() => { btn.textContent = 'Add to basket'; }, 2000);
   });
-  document.getElementById('toggle-wishlist')?.addEventListener('click', () => {
-    Wishlist.toggle(product.id);
+  document.getElementById('toggle-wishlist')?.addEventListener('click', async () => {
+    await Wishlist.toggle(product.id);
     const btn = document.getElementById('toggle-wishlist');
     const on = Wishlist.has(product.id);
     btn.textContent = on ? '♥ In wishlist' : '♡ Add to wishlist';

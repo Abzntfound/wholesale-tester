@@ -5,12 +5,15 @@
 import { DATA_SOURCE } from './config.js';
 import { loadLocalProducts } from './adapters/localAdapter.js';
 import { loadRemoteProducts } from './adapters/remoteAdapter.js';
+import { loadSupabaseProducts } from './adapters/supabaseAdapter.js';
+import { searchProducts as searchProductsQuery } from './searchRepository.js';
 import {
   normalizeProduct,
   calcDiscount,
   formatCurrency,
   getStockLabel,
-  getProductDisplayName
+  getProductDisplayName,
+  slugify
 } from '../js/product-model.js';
 
 let cache = null;
@@ -25,6 +28,8 @@ export async function initProductRepository() {
     try {
       if (DATA_SOURCE === 'remote') {
         cache = await loadRemoteProducts();
+      } else if (DATA_SOURCE === 'supabase') {
+        cache = await loadSupabaseProducts();
       } else {
         cache = loadLocalProducts();
       }
@@ -59,6 +64,20 @@ export function getProductById(id) {
 
 export function getProductBySku(sku) {
   return getProductById(sku);
+}
+
+export function getProductBySlug(slug) {
+  if (!slug) return null;
+  const normalised = slug.toLowerCase();
+  return getCache().find(p =>
+    p.slug === normalised ||
+    p.slug === slug ||
+    slugify(p.name) === normalised
+  ) ?? null;
+}
+
+export function searchProducts(query, options = {}) {
+  return searchProductsQuery(query, options);
 }
 
 export function getProductByUrl(url) {
@@ -191,4 +210,4 @@ export function calcUnitPrice(product) {
   return Math.round((product.price / qty) * 100) / 100;
 }
 
-export { calcDiscount, formatCurrency, getStockLabel, getProductDisplayName, normalizeProduct };
+export { calcDiscount, formatCurrency, getStockLabel, getProductDisplayName, normalizeProduct, slugify };

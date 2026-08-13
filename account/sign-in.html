@@ -7,10 +7,10 @@
 </head>
 <body>
   <main class="container page-main auth-page">
-    <a href="joblots.html" class="logo auth-logo">Wholesale Clearance UK</a>
+    <a href="../joblots.html" class="logo auth-logo">Wholesale Clearance UK</a>
     <div class="auth-card">
       <h1>Sign in</h1>
-      <p class="auth-note">Front-end prototype — credentials stored locally for demo only. Not secure.</p>
+      <p class="auth-note" id="auth-mode-note">Loading…</p>
       <form id="sign-in-form" class="auth-form">
         <label>Email <input type="email" name="email" required autocomplete="email"></label>
         <label>Password <input type="password" name="password" required autocomplete="current-password"></label>
@@ -21,17 +21,20 @@
     </div>
   </main>
   <script type="module">
-    import { signIn } from '../js/account.js';
-    document.getElementById('sign-in-form').addEventListener('submit', (e) => {
+    import { signIn, getAuthModeLabel } from '../js/account.js';
+    document.getElementById('auth-mode-note').textContent = getAuthModeLabel();
+    document.getElementById('sign-in-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
+      const errEl = document.getElementById('auth-error');
+      errEl.hidden = true;
       try {
-        signIn(fd.get('email'), fd.get('password'));
-        const ret = new URLSearchParams(location.search).get('return') || 'index.html';
+        await signIn(fd.get('email'), fd.get('password'));
+        const ret = new URLSearchParams(location.search).get('return') || '../account/index.html';
         location.href = ret;
       } catch (err) {
-        const el = document.getElementById('auth-error');
-        el.hidden = false; el.textContent = err.message;
+        errEl.hidden = false;
+        errEl.textContent = err.message;
       }
     });
   </script>

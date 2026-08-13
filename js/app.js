@@ -37,11 +37,12 @@ function init() {
   initSearchUI();
   renderFeaturedSections();
   renderPopularCategories();
+  syncUIFromState(currentState);
+  toggleFilteredMode(currentState);
   renderCatalogue();
   updateBadges();
   updateStructuredData();
   onPopState(handleStateChange);
-  syncUIFromState(currentState);
 }
 
 function handleStateChange(state) {
@@ -425,7 +426,6 @@ function bindMobileUI() {
 function updateBadges() {
   Cart.updateBadge();
   Wishlist.updateBadge();
-  document.addEventListener('wishlist:updated', () => Wishlist.updateBadge());
 }
 
 function updateStructuredData() {

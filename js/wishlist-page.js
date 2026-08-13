@@ -9,12 +9,12 @@ import * as Cart from './cart.js';
 async function bootstrap() {
   initLayout();
   await initProductRepository();
-  render();
+  await render();
 }
 
-function render() {
+async function render() {
   const el = document.getElementById('wishlist-content');
-  const ids = Wishlist.getAll();
+  const ids = await Wishlist.getAll();
 
   if (!ids.length) {
     el.innerHTML = `<div class="empty-state"><h1>Your wishlist is empty</h1><p>Save products you're interested in and come back later.</p><a href="joblots.html" class="btn btn-primary">Browse stock</a></div>`;
@@ -33,8 +33,15 @@ function render() {
       </div></div></article>`;
   }).join('')}</div>`;
 
-  el.querySelectorAll('[data-remove]').forEach(btn => btn.addEventListener('click', () => { Wishlist.remove(btn.dataset.remove); render(); }));
-  el.querySelectorAll('[data-move]').forEach(btn => btn.addEventListener('click', () => { Cart.add(btn.dataset.move); Wishlist.remove(btn.dataset.move); render(); }));
+  el.querySelectorAll('[data-remove]').forEach(btn => btn.addEventListener('click', async () => {
+    await Wishlist.remove(btn.dataset.remove);
+    await render();
+  }));
+  el.querySelectorAll('[data-move]').forEach(btn => btn.addEventListener('click', async () => {
+    await Cart.add(btn.dataset.move);
+    await Wishlist.remove(btn.dataset.move);
+    await render();
+  }));
 }
 
 function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }

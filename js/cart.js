@@ -1,78 +1,43 @@
 /**
- * Basket — localStorage persistence (front-end prototype).
- * Checkout connects to real WCUK cart when configured.
+ * Basket — delegates to basketRepository.
  */
+import * as BasketRepo from '../repositories/basketRepository.js';
 import { CHECKOUT_URL } from '../repositories/config.js';
 
-const STORAGE_KEY = 'wcuk_basket';
-
-function read() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
+export async function getAll() {
+  return BasketRepo.getAll();
 }
 
-function write(items) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  document.dispatchEvent(new CustomEvent('cart:updated'));
+export async function getCount() {
+  return BasketRepo.getCount();
 }
 
-export function getAll() {
-  return read();
+export async function getItems() {
+  return BasketRepo.getAll();
 }
 
-export function getCount() {
-  return read().reduce((sum, i) => sum + (i.quantity || 1), 0);
+export async function add(productId, quantity = 1) {
+  return BasketRepo.add(productId, quantity);
 }
 
-export function getItems() {
-  return read();
+export async function remove(productId) {
+  return BasketRepo.remove(productId);
 }
 
-export function add(productId, quantity = 1) {
-  const items = read();
-  const existing = items.find(i => i.productId === productId);
-  if (existing) {
-    existing.quantity = (existing.quantity || 1) + quantity;
-  } else {
-    items.push({ productId, quantity, addedAt: Date.now() });
-  }
-  write(items);
-  return items;
+export async function setQuantity(productId, quantity) {
+  return BasketRepo.setQuantity(productId, quantity);
 }
 
-export function remove(productId) {
-  write(read().filter(i => i.productId !== productId));
+export async function clear() {
+  return BasketRepo.clear();
 }
 
-export function setQuantity(productId, quantity) {
-  const items = read();
-  const item = items.find(i => i.productId === productId);
-  if (!item) return;
-  if (quantity <= 0) {
-    remove(productId);
-    return;
-  }
-  item.quantity = quantity;
-  write(items);
+export async function getSubtotal(products) {
+  return BasketRepo.getSubtotal(products);
 }
 
-export function clear() {
-  write([]);
-}
-
-export function getSubtotal(products) {
-  const items = read();
-  return items.reduce((sum, item) => {
-    const p = products.find(x => x.id === item.productId);
-    return sum + (p?.price || 0) * (item.quantity || 1);
-  }, 0);
-}
-
-export function updateBadge() {
-  const count = getCount();
+export async function updateBadge() {
+  const count = await getCount();
   document.querySelectorAll('[data-cart-count]').forEach(el => {
     el.textContent = count;
     el.classList.toggle('has-items', count > 0);
@@ -87,3 +52,15 @@ export function getCheckoutUrl() {
 export function proceedToCheckout() {
   window.location.href = CHECKOUT_URL;
 }
+
+export async function syncAfterLogin() {
+  return BasketRepo.syncLocalToAccount();
+}
+
+/** Sync badge on load — call from layout */
+export function initCart() {
+  updateBadge();
+  document.addEventListener('cart:updated', () => updateBadge());
+}
+
+initCart();

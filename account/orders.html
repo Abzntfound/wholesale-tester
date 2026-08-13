@@ -9,16 +9,40 @@
   <main class="container page-main account-page">
     <h1>My orders</h1>
     <nav class="account-nav"><a href="index.html">← Back to account</a></nav>
-    <table class="orders-table"><thead><tr><th>Order</th><th>Date</th><th>Status</th><th>Total</th></tr></thead>
+    <table class="orders-table"><thead><tr><th>Order</th><th>Date</th><th>Status</th><th>Payment</th><th>Total</th></tr></thead>
     <tbody id="orders-body"></tbody></table>
-    <p class="prototype-note">Sample order history for prototype UI.</p>
+    <p id="orders-note" class="prototype-note" hidden></p>
   </main>
   <script type="module">
-    import { requireAuth, getDemoOrders } from '../js/account.js';
-    if (!requireAuth()) throw new Error('redirect');
-    document.getElementById('orders-body').innerHTML = getDemoOrders().map(o =>
-      `<tr><td><a href="order.html?id=${o.id}">${o.id}</a></td><td>${o.date}</td><td>${o.status}</td><td>£${o.total.toFixed(2)}</td></tr>`
-    ).join('');
+    import { requireAuth, getDemoOrders, isAuthConfigured } from '../js/account.js';
+    import { getOrders } from '../repositories/orderRepository.js';
+
+    if (!(await requireAuth())) throw new Error('redirect');
+
+    let orders = [];
+    try {
+      orders = await getOrders();
+    } catch {
+      orders = [];
+    }
+
+    if (!orders.length && !isAuthConfigured()) {
+      orders = getDemoOrders();
+      document.getElementById('orders-note').hidden = false;
+      document.getElementById('orders-note').textContent = 'Demo order history — configure Supabase for real orders.';
+    }
+
+    const tbody = document.getElementById('orders-body');
+    if (!orders.length) {
+      tbody.innerHTML = '<tr><td colspan="5">No orders yet.</td></tr>';
+    } else {
+      tbody.innerHTML = orders.map(o => {
+        const id = o.order_number || o.id;
+        const date = (o.created_at || o.date || '').slice(0, 10);
+        const total = o.total ?? o.total_amount ?? 0;
+        return `<tr><td><a href="order.html?id=${encodeURIComponent(o.id || id)}">${id}</a></td><td>${date}</td><td>${o.status || '—'}</td><td>${o.payment_status || '—'}</td><td>£${Number(total).toFixed(2)}</td></tr>`;
+      }).join('');
+    }
   </script>
 </body>
 </html>

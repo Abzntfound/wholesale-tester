@@ -8,13 +8,12 @@ import * as Cart from './cart.js';
 async function bootstrap() {
   initLayout();
   await initProductRepository();
-  render();
-  document.getElementById('checkout-btn')?.addEventListener('click', () => Cart.proceedToCheckout());
+  await render();
 }
 
-function render() {
+async function render() {
   const el = document.getElementById('basket-content');
-  const items = Cart.getItems();
+  const items = await Cart.getItems();
 
   if (!items.length) {
     el.innerHTML = `<div class="empty-state"><h1>Your basket is empty</h1><p>Browse our wholesale job lots and add products to your basket.</p><a href="joblots.html" class="btn btn-primary">Browse stock</a></div>`;
@@ -35,22 +34,25 @@ function render() {
   }).join('');
 
   const products = items.map(i => getProductById(i.productId)).filter(Boolean);
-  const subtotal = Cart.getSubtotal(products);
+  const subtotal = await Cart.getSubtotal(products);
 
   el.innerHTML = `<h1>Basket</h1><div class="basket-items">${rows}</div>
     <aside class="basket-summary"><h2>Order summary</h2>
       <p>Subtotal: <strong>${formatCurrency(subtotal)}</strong></p>
-      <p class="basket-summary-note">Delivery calculated at checkout.</p>
-      <p class="basket-summary-note">Estimated delivery: 3–5 working days (UK).</p>
-      <p>Total: <strong class="basket-total">${formatCurrency(subtotal)}</strong></p>
-      <button type="button" class="btn btn-primary btn-lg btn-block" id="checkout-btn">Proceed to checkout</button>
+      <p class="basket-summary-note">Delivery and VAT calculated at checkout.</p>
+      <p>Total: <strong class="basket-total">${formatCurrency(subtotal)}</strong> <span class="basket-summary-note">(ex. VAT)</span></p>
+      <a href="checkout.html" class="btn btn-primary btn-lg btn-block" id="checkout-btn">Proceed to checkout</a>
       <a href="joblots.html" class="btn btn-ghost btn-block">Continue shopping</a>
-      <p class="prototype-note">Prototype basket — checkout connects to live WCUK cart.</p>
     </aside>`;
 
-  el.querySelectorAll('[data-remove]').forEach(btn => btn.addEventListener('click', () => { Cart.remove(btn.dataset.remove); render(); }));
-  el.querySelectorAll('[data-qty]').forEach(input => input.addEventListener('change', () => { Cart.setQuantity(input.dataset.qty, parseInt(input.value, 10)); render(); }));
-  document.getElementById('checkout-btn')?.addEventListener('click', () => Cart.proceedToCheckout());
+  el.querySelectorAll('[data-remove]').forEach(btn => btn.addEventListener('click', async () => {
+    await Cart.remove(btn.dataset.remove);
+    await render();
+  }));
+  el.querySelectorAll('[data-qty]').forEach(input => input.addEventListener('change', async () => {
+    await Cart.setQuantity(input.dataset.qty, parseInt(input.value, 10));
+    await render();
+  }));
 }
 
 function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }

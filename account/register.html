@@ -10,7 +10,7 @@
     <a href="../joblots.html" class="logo auth-logo">Wholesale Clearance UK</a>
     <div class="auth-card">
       <h1>Create account</h1>
-      <p class="auth-note">Demo registration — stored in localStorage only.</p>
+      <p class="auth-note" id="auth-mode-note"></p>
       <form id="register-form" class="auth-form">
         <label>Name <input type="text" name="name" required autocomplete="name"></label>
         <label>Email <input type="email" name="email" required autocomplete="email"></label>
@@ -19,19 +19,30 @@
       </form>
       <p class="auth-links"><a href="sign-in.html">Already have an account?</a></p>
       <p id="auth-error" class="auth-error" role="alert" hidden></p>
+      <p id="auth-success" class="auth-success" role="status" hidden></p>
     </div>
   </main>
   <script type="module">
-    import { register } from '../js/account.js';
-    document.getElementById('register-form').addEventListener('submit', (e) => {
+    import { register, getAuthModeLabel } from '../js/account.js';
+    document.getElementById('auth-mode-note').textContent = getAuthModeLabel();
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
+      const errEl = document.getElementById('auth-error');
+      const okEl = document.getElementById('auth-success');
+      errEl.hidden = true;
+      okEl.hidden = true;
       try {
-        register({ name: fd.get('name'), email: fd.get('email'), password: fd.get('password') });
-        location.href = 'index.html';
+        const result = await register({ name: fd.get('name'), email: fd.get('email'), password: fd.get('password') });
+        if (result.message) {
+          okEl.hidden = false;
+          okEl.textContent = result.message;
+        } else {
+          location.href = 'index.html';
+        }
       } catch (err) {
-        const el = document.getElementById('auth-error');
-        el.hidden = false; el.textContent = err.message;
+        errEl.hidden = false;
+        errEl.textContent = err.message;
       }
     });
   </script>

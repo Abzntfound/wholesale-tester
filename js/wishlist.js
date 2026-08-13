@@ -1,56 +1,64 @@
 /**
- * Wishlist — localStorage persistence.
+ * Wishlist — delegates to wishlistRepository.
  */
-const STORAGE_KEY = 'wcuk_wishlist';
+import * as WishlistRepo from '../repositories/wishlistRepository.js';
 
-function read() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
+const cache = new Set();
+let cacheReady = false;
+
+async function refreshCache() {
+  const ids = await WishlistRepo.getAll();
+  cache.clear();
+  ids.forEach(id => cache.add(id));
+  cacheReady = true;
 }
 
-function write(items) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  document.dispatchEvent(new CustomEvent('wishlist:updated'));
+export async function getAll() {
+  await refreshCache();
+  return [...cache];
 }
 
-export function getAll() {
-  return read();
-}
-
-export function getCount() {
-  return read().length;
+export async function getCount() {
+  return WishlistRepo.getCount();
 }
 
 export function has(productId) {
-  return read().includes(productId);
-}
-
-export function add(productId) {
-  const items = read();
-  if (!items.includes(productId)) {
-    items.push(productId);
-    write(items);
+  if (cacheReady) return cache.has(productId);
+  try {
+    const ids = JSON.parse(localStorage.getItem('wcuk_wishlist')) || [];
+    return ids.includes(productId);
+  } catch {
+    return false;
   }
-  return items;
 }
 
-export function remove(productId) {
-  write(read().filter(id => id !== productId));
+export async function add(productId) {
+  await WishlistRepo.add(productId);
+  cache.add(productId);
+  return [...cache];
 }
 
-export function toggle(productId) {
-  return has(productId) ? remove(productId) : add(productId);
+export async function remove(productId) {
+  await WishlistRepo.remove(productId);
+  cache.delete(productId);
 }
 
-export function clear() {
-  write([]);
+export async function toggle(productId) {
+  if (has(productId)) {
+    await remove(productId);
+    return false;
+  }
+  await add(productId);
+  return true;
 }
 
-export function updateBadge() {
-  const count = getCount();
+export async function clear() {
+  await WishlistRepo.clear();
+  cache.clear();
+}
+
+export async function updateBadge() {
+  const count = await getCount();
   document.querySelectorAll('[data-wishlist-count]').forEach(el => {
     el.textContent = count;
     el.classList.toggle('has-items', count > 0);
@@ -58,8 +66,23 @@ export function updateBadge() {
   });
 }
 
-export function moveToBasket(productId, addToCart) {
-  if (!has(productId)) return;
-  addToCart(productId);
-  remove(productId);
+export async function moveToBasket(productId, addToCart) {
+  await WishlistRepo.moveToBasket(productId, addToCart);
+  cache.delete(productId);
 }
+
+export async function syncAfterLogin() {
+  await WishlistRepo.syncLocalToAccount();
+  await refreshCache();
+}
+
+export async function initWishlist() {
+  await refreshCache();
+  updateBadge();
+  document.addEventListener('wishlist:updated', async () => {
+    await refreshCache();
+    updateBadge();
+  });
+}
+
+initWishlist();

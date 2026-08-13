@@ -1,13 +1,19 @@
 /**
  * Repository configuration — switch data source without UI changes.
  */
-export const DATA_SOURCE = 'local'; // 'local' | 'remote' | 'live-seed'
+import { ENV } from '../js/env.js';
+
+/** 'local' | 'supabase' | 'remote' */
+export const DATA_SOURCE = ENV.DATA_SOURCE || 'local';
 
 /** Authorised product API — connect when available */
 export const REMOTE_PRODUCTS_URL = '/api/products';
 
-/** Existing WCUK checkout (real) — prototype basket redirects here */
-export const CHECKOUT_URL = 'https://www.wholesaleclearance.co.uk/cart.php';
+/** Internal checkout page */
+export const CHECKOUT_URL = 'checkout.html';
+
+/** Legacy WCUK checkout fallback */
+export const LEGACY_CHECKOUT_URL = 'https://www.wholesaleclearance.co.uk/cart.php';
 
 /** Legacy site base for external product links */
 export const LEGACY_SITE_BASE = 'https://www.wholesaleclearance.co.uk';
@@ -20,3 +26,5 @@ export const IMAGE_CDN = {
 };
 
 export const PER_PAGE = 24;
+
+export { ENV };
