@@ -1,0 +1,9 @@
+{
+  "name": "wholesale-clearance-uk",
+  "private": true,
+  "description": "Wholesale Clearance UK job lots catalogue",
+  "scripts": {
+    "start": "npx --yes serve -l 3000 .",
+    "serve:python": "python -m http.server 8080"
+  }
+}
